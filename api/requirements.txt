@@ -1,5 +1,0 @@
-flask
-requests
-boto3
-botocore
-serverless-wsgi
