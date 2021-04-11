@@ -1,34 +1,41 @@
-export function performGet() {
-  return fetch(`${getApiUrlPrefix()}/todos`)
-    .then((response) => response.json())
-    .catch((error) => console.log(error));
+const API_URL_PREFIX = getApiUrlPrefix();
+
+export function performGet(pageCount) {
+  return performHttpRequest("/todos", { pageCount });
 }
 
 export function performSave(todo) {
-  return fetch(`${getApiUrlPrefix()}/todos`, {
+  return performHttpRequest("/todo/add", todo);
+}
+
+export function performDelete(todo) {
+  return performHttpRequest("/todo/delete", {
+    id: todo.id,
+    idRange: todo.idRange,
+  });
+}
+
+export function performDeleteAll(deleteKey) {
+  return performHttpRequest("/todo/deleteall", {
+    deleteKey,
+  });
+}
+
+export function performUpdate(todo) {
+  return performHttpRequest("/todo/update", {
+    id: todo.id,
+    idRange: todo.idRange,
+    isDone: todo.isDone,
+  });
+}
+
+function performHttpRequest(urlSuffix, body = {}) {
+  return fetch(`${API_URL_PREFIX}${urlSuffix}`, {
     headers: {
       "Content-Type": "application/json",
     },
     method: "POST",
-    body: JSON.stringify(todo),
-  })
-    .then((response) => response.json())
-    .catch((error) => console.log(error));
-}
-
-export function performDelete(todoId) {
-  return fetch(`${getApiUrlPrefix()}/todos/${todoId}`, { method: "DELETE" })
-    .then((response) => response.json())
-    .catch((error) => console.log(error));
-}
-
-export function performUpdate(todo, todoId) {
-  return fetch(`${getApiUrlPrefix()}/todos/${todoId}`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "PUT",
-    body: JSON.stringify(todo),
+    body: JSON.stringify(body),
   })
     .then((response) => response.json())
     .catch((error) => console.log(error));
@@ -36,7 +43,8 @@ export function performUpdate(todo, todoId) {
 
 function getApiUrlPrefix() {
   if (process.env.NODE_ENV === "development") {
-    return "http://localhost:5000";
+    console.log("dev env");
+    return "";
   }
   return "http://localhost:3000";
 }

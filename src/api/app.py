@@ -1,6 +1,6 @@
 import os
 import json
-
+import uuid
 import boto3
 import dynamodb
 
@@ -9,6 +9,8 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+
+UUID = str(uuid.uuid4())
 TABLE_NAME = "Todos"
 AWS_ENV = os.environ.get("AWS_REGION") is not None
 client = (
@@ -20,13 +22,20 @@ client = (
 
 @app.route("/todos", methods=["POST"])
 def get_todos():
-    last_eval_key = request.json.get("key")
-    response = dynamodb.get_todos(last_eval_key)
-    print(response)
-    return_dict = {"todos": dynamodb.deserialize(response["Items"])}
+    page_count = request.json.get("pageCount")
+    new_index, response = dynamodb.get_todos(page_count)
+    deserialized = dynamodb.deserialize(response["Items"])
 
-    if response.get("LastEvaluatedKey") is not None:
-        return_dict["lastEvalKey"] = dynamodb.encode(response["LastEvaluatedKey"])
+    for d in deserialized:
+        d["idRange"] = int(d.get("idRange"))
+
+    return_dict = {
+        "todos": deserialized,
+        "deleteKey": UUID
+    }
+
+    if new_index <= response.get("ScannedCount"):
+        return_dict["pageCount"] = new_index
 
     return return_dict
 
@@ -40,18 +49,36 @@ def get_details():
 @app.route("/todo/update", methods=["POST"])
 def update_todo():
     response = dynamodb.update_todo(request.json)
-    print(response)
     return jsonify(response)
 
 
 @app.route("/todo/delete", methods=["POST"])
 def delete_todo():
-    return dynamodb.delete_todo(request.json["id"])
+    return dynamodb.delete_todo(request.json)
+
+
+@app.route("/todo/deleteall", methods=["POST"])
+def delete_all_todos():
+    if request.json.get("deleteKey") == UUID:
+        dynamodb.delete_all()
+        return jsonify({
+            "msg": "Deleted all todos"
+        }), 200
+
+    return jsonify({
+        "msg": "Cannot delete all todos"
+    }), 500
 
 
 @app.route("/todo/add", methods=["POST"])
 def add_todo():
-    return dynamodb.put_todo(request.json)
+    id_, response = dynamodb.put_todo(request.json)
+    print(id_)
+    print(response)
+    return jsonify({
+        "response": response,
+        "id": id_
+    })
 
 
 def get_data():

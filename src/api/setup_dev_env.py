@@ -1,5 +1,6 @@
 import boto3
 import json
+import uuid
 
 TABLE_NAME = "Todos"
 
@@ -26,11 +27,19 @@ def create_table():
                 'AttributeName': 'Id',
                 'AttributeType': 'S'
             },
+            {
+                'AttributeName': 'IdRange',
+                'AttributeType': 'N'
+            },
         ],
         KeySchema=[
             {
                 'AttributeName': 'Id',
                 'KeyType': 'HASH'
+            },
+            {
+                'AttributeName': 'IdRange',
+                'KeyType': 'RANGE'
             },
         ],
         ProvisionedThroughput={
@@ -45,7 +54,10 @@ def create_table():
             TableName=TABLE_NAME,
             Item={
                 "Id": {
-                    "S": todo["id"]
+                    "S": str(uuid.uuid4())
+                },
+                "IdRange": {
+                    "N": todo["idRange"]
                 },
                 "Title": {
                     "S": todo["title"]

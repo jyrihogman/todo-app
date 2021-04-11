@@ -6,7 +6,8 @@ import PropTypes from "prop-types";
 const Todo = (props) => {
   let history = useHistory();
 
-  const { id, title, description, deleteTodo, setTodoDone, isDone } = props;
+  const { deleteTodo, setTodoDone } = props;
+  const { id, title, description, isDone } = props.todo;
 
   const cardColor = isDone ? "text-white bg-secondary" : "";
   const btnColor = isDone
@@ -14,6 +15,7 @@ const Todo = (props) => {
     : "btn btn-outline-primary btn-sm";
 
   const navigateToDetails = () => {
+    localStorage.setItem("todo", JSON.stringify(props.todo));
     history.push(`/todo/${id}`);
   };
 
@@ -36,7 +38,7 @@ const Todo = (props) => {
         >
           {!isDone ? "Done" : "Undone"}
         </button>
-        <button id={id} onClick={deleteTodo} className={btnColor}>
+        <button id={id} onClick={deleteTodo} className="btn btn-primary btn-lg">
           Delete
         </button>
       </div>
@@ -45,10 +47,13 @@ const Todo = (props) => {
 };
 
 Todo.propTypes = {
-  id: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
-  isDone: PropTypes.bool.isRequired,
-  description: PropTypes.string.isRequired,
+  todo: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    isDone: PropTypes.bool.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    date: PropTypes.string.isRequired,
+  }).isRequired,
   setTodoDone: PropTypes.func.isRequired,
   deleteTodo: PropTypes.func.isRequired,
 };

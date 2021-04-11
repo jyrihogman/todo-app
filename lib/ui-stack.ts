@@ -4,13 +4,12 @@ import * as s3deploy from '@aws-cdk/aws-s3-deployment';
 import * as cloudfront from '@aws-cdk/aws-cloudfront';
 import * as origins from '@aws-cdk/aws-cloudfront-origins';
 
-export class DeploymentStack extends cdk.Stack {
+export class UiStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
     const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
-      websiteIndexDocument: 'index.html',
-      publicReadAccess: true
+      bucketName: "ui-bucket"
     });
     
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
@@ -20,6 +19,14 @@ export class DeploymentStack extends cdk.Stack {
 
     new cloudfront.Distribution(this, 'myDist', {
       defaultBehavior: { origin: new origins.S3Origin(websiteBucket) },
+      errorResponses: [
+        {
+          responseHttpStatus: 200,
+          responsePagePath: "/index.html",
+          ttl: cdk.Duration.seconds(0),
+          httpStatus: 404
+        }
+      ]
     });
   }
 }
