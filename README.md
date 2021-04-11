@@ -1,14 +1,8 @@
-# Welcome to your CDK TypeScript project!
+# Welcome to todo app!
 
-This is a blank project for TypeScript development with CDK.
+Run setup_dev_env.sh
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+-> flask run in src/api
+-> npm start in src/ui
 
-## Useful commands
-
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+http://localhost:3000
