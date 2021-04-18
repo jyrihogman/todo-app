@@ -1,14 +1,12 @@
 import pytest
-import boto3
-import app
 import json
 import os
 
-import dynamodb
-from setup_tests import create_table, uuids
-from moto import mock_dynamodb2, mock_dynamodb
+from service import dynamodb
+from setup_tests import create_table
+from moto import mock_dynamodb2
 from flask import current_app
-from app import app
+from api.api import app
 
 
 @pytest.fixture(autouse=True)

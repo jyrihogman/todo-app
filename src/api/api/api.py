@@ -2,7 +2,7 @@ import os
 import simplejson as json
 import uuid
 import boto3
-import dynamodb
+from service import dynamodb
 
 from flask import Flask, request, jsonify
 

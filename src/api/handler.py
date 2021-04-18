@@ -1,5 +1,6 @@
-import app  # Replace with your actual application 
+from api import api
 import serverless_wsgi
- 
+
+
 def handler(event, context):
-    return serverless_wsgi.handle_request(app.app, event, context)
+    return serverless_wsgi.handle_request(api.app, event, context)
