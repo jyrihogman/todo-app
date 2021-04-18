@@ -2,13 +2,14 @@ import os
 import simplejson as json
 import uuid
 import boto3
-from service import dynamodb
 
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
+from service import dynamodb
 
 app = Flask(__name__)
-
+CORS(app)
 
 UUID = str(uuid.uuid4())
 TABLE_NAME = "Todos"

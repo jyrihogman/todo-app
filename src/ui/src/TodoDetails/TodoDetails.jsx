@@ -1,8 +1,16 @@
 import React from "react";
 
-const TodoDetails = () => {
+const TodoDetails = (props) => {
   const todo = JSON.parse(localStorage.getItem("todo"));
   const date = new Date(todo.date);
+
+  const handleStatusChange = (e) => {
+    props.setTodoDone(e);
+  };
+
+  const handleDeletion = (e) => {
+    props.deleteTodo(e);
+  };
 
   console.log();
   return (
@@ -26,25 +34,21 @@ const TodoDetails = () => {
         <button
           value={todo.id}
           style={{ marginRight: "10%" }}
-          // onClick={setTodoDone}
+          onClick={handleStatusChange}
           className="btn btn-primary btn-lg"
         >
           {!todo.isDone ? "Done" : "Undone"}
         </button>
-        <button id={todo.id} className="btn btn-primary btn-lg">
+        <button
+          id={todo.id}
+          className="btn btn-primary btn-lg"
+          onClick={handleDeletion}
+        >
           Delete
         </button>
       </div>
     </div>
   );
-
-  // return (
-  //   <div className="col-md-12">
-  //     <div className="row justify-content-md-center">
-  //       <span className="details-text">{date.toUTCString()}</span>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default TodoDetails;

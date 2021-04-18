@@ -10,7 +10,6 @@ export class ApiStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    console.log(path.join(__dirname, "../src/api/"));
     const table = new dynamo.Table(this, "TodoTable", {
       tableName: "Todos",
       partitionKey: { name: "Id", type: dynamo.AttributeType.STRING },
@@ -52,7 +51,7 @@ export class ApiStack extends cdk.Stack {
       restApiName: "TodoApiGw",
       handler: pythonFn,
       defaultCorsPreflightOptions: {
-        allowOrigins: ["http://d1aaeosv4er2k8.cloudfront.net"],
+        allowOrigins: ["http://dn62x0l5shy6z.cloudfront.net"],
         allowMethods: apigw.Cors.ALL_METHODS,
       },
     });

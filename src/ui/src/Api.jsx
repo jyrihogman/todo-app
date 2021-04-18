@@ -46,5 +46,6 @@ function getApiUrlPrefix() {
     console.log("dev env");
     return "";
   }
+  // Set up to use apiUrl from config.json
   return "https://fsscijtoe1.execute-api.eu-west-1.amazonaws.com/prod";
 }

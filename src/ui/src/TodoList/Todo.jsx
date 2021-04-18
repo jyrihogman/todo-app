@@ -38,7 +38,7 @@ const Todo = (props) => {
         >
           {!isDone ? "Done" : "Undone"}
         </button>
-        <button id={id} onClick={deleteTodo} className="btn btn-primary btn-lg">
+        <button id={id} onClick={deleteTodo} className="btn btn-primary btn-sm">
           Delete
         </button>
       </div>
