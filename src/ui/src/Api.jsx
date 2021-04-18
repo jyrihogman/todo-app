@@ -46,5 +46,5 @@ function getApiUrlPrefix() {
     console.log("dev env");
     return "";
   }
-  return "http://localhost:3000";
+  return "https://fsscijtoe1.execute-api.eu-west-1.amazonaws.com/prod";
 }

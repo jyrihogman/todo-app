@@ -9,11 +9,11 @@ export class UiStack extends cdk.Stack {
     super(scope, id, props);
 
     const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
-      bucketName: "ui-bucket"
+      bucketName: "todojyri-ui-bucket",
     });
     
     new s3deploy.BucketDeployment(this, 'DeployWebsite', {
-      sources: [s3deploy.Source.asset('./website-dist')],
+      sources: [s3deploy.Source.asset('./src/ui/build/')],
       destinationBucket: websiteBucket,
     });
 
@@ -26,7 +26,8 @@ export class UiStack extends cdk.Stack {
           ttl: cdk.Duration.seconds(0),
           httpStatus: 404
         }
-      ]
+      ],
+      defaultRootObject: "index.html"
     });
   }
 }
