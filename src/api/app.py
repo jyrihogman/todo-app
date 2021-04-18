@@ -1,5 +1,5 @@
 import os
-import json
+import simplejson as json
 import uuid
 import boto3
 import dynamodb
@@ -13,11 +13,6 @@ app = Flask(__name__)
 UUID = str(uuid.uuid4())
 TABLE_NAME = "Todos"
 AWS_ENV = os.environ.get("AWS_REGION") is not None
-client = (
-    boto3.client("dynamodb")
-    if AWS_ENV
-    else boto3.client("dynamodb", endpoint_url="http://localhost:8080")
-)
 
 
 @app.route("/todos", methods=["POST"])
@@ -73,8 +68,7 @@ def delete_all_todos():
 @app.route("/todo/add", methods=["POST"])
 def add_todo():
     id_, response = dynamodb.put_todo(request.json)
-    print(id_)
-    print(response)
+
     return jsonify({
         "response": response,
         "id": id_

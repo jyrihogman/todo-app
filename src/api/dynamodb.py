@@ -6,13 +6,6 @@ from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 from botocore.paginate import TokenEncoder, TokenDecoder
 
 TABLE_NAME = "Todos"
-AWS_ENV = os.environ.get("AWS_REGION") is not None
-
-client = (
-    boto3.client("dynamodb")
-    if AWS_ENV
-    else boto3.client("dynamodb", endpoint_url="http://localhost:8080")
-)
 
 encoder = TokenEncoder()
 decoder = TokenDecoder()
@@ -24,7 +17,7 @@ def get_todos(page_count):
     low_value = page_count if page_count is not None else 0
     max_value = low_value + 10
 
-    response = client.scan(TableName=TABLE_NAME,
+    response = get_dynamo_client().scan(TableName=TABLE_NAME,
                            Limit=20,
                            ExpressionAttributeValues={
                                ':min': {"N": str(low_value)},
@@ -36,8 +29,12 @@ def get_todos(page_count):
 
 
 def get_todo(identifier):
-    item = client.get_item(TableName=TABLE_NAME, Key={"Id": {"S": identifier}})
-    return deserialize(item["Item"])
+    items = get_dynamo_client().query(TableName=TABLE_NAME,
+                                      KeyConditionExpression="Id = :id",
+                                      ExpressionAttributeValues={
+                                        ":id": {"S": identifier}}
+                                      )
+    return deserialize(items["Items"][0])
 
 
 def put_todo(todo):
@@ -50,19 +47,19 @@ def put_todo(todo):
         "Date": {"S": todo["date"]},
         "IsDone": {"BOOL": todo["isDone"]}
     }
-    response = client.put_item(TableName=TABLE_NAME, Item=serialized)
+    response = get_dynamo_client().put_item(TableName=TABLE_NAME, Item=serialized)
     return id_, response
 
 
 def delete_todo(payload):
-    return client.delete_item(
+    return get_dynamo_client().delete_item(
         TableName=TABLE_NAME,
         Key={"Id": {"S": payload["id"]}, "IdRange": {"N": str(payload["idRange"])}}
     )
 
 
 def update_todo(payload):
-    return client.update_item(
+    return get_dynamo_client().update_item(
         TableName=TABLE_NAME,
         Key={"Id": {"S": payload["id"]}, "IdRange": {"N": str(payload["idRange"])}},
         UpdateExpression="set IsDone=:d",
@@ -72,11 +69,11 @@ def update_todo(payload):
 
 # Tad crazy, but hey it's efficient
 def delete_all():
-    client.delete_table(
+    get_dynamo_client().delete_table(
         TableName=TABLE_NAME
     )
 
-    client.create_table(
+    get_dynamo_client().create_table(
         TableName=TABLE_NAME,
         AttributeDefinitions=[
             {
@@ -141,3 +138,13 @@ def decode(key):
 
 def encode(key):
     return encoder.encode(key)
+
+
+def get_dynamo_client():
+    aws_env = os.environ.get("AWS_REGION") is not None
+
+    return (
+        boto3.client("dynamodb")
+        if aws_env
+        else boto3.client("dynamodb", endpoint_url="http://localhost:8080")
+    )

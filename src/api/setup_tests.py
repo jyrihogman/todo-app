@@ -1,8 +1,9 @@
 import boto3
 import json
-import uuid
+
 
 TABLE_NAME = "Todos"
+uuids = []
 
 
 def get_todos():
@@ -11,15 +12,7 @@ def get_todos():
 
 
 def create_table():
-    dynamo = boto3.client('dynamodb', endpoint_url='http://localhost:8080')
-
-    existing_tables = dynamo.list_tables()['TableNames']
-
-    if TABLE_NAME in existing_tables:
-        dynamo.delete_table(
-            TableName=TABLE_NAME
-        )
-
+    dynamo = boto3.client("dynamodb")
     dynamo.create_table(
         TableName=TABLE_NAME,
         AttributeDefinitions=[
@@ -48,14 +41,12 @@ def create_table():
         }
     )
 
-    for todo in get_todos():
-        guid = str(uuid.uuid4())
-
+    for num, todo in enumerate(get_todos()):
         dynamo.put_item(
             TableName=TABLE_NAME,
             Item={
                 "Id": {
-                    "S": guid
+                    "S": f"testing_id_{num}"
                 },
                 "IdRange": {
                     "N": todo["idRange"]
@@ -74,6 +65,3 @@ def create_table():
                 }
             }
         )
-
-
-create_table()
