@@ -4,16 +4,14 @@ import PropTypes from "prop-types";
 import Todo from "./Todo";
 
 const TodoList = (props) => {
-  const todoComponents = props.todos
-    .sort((a, b) => a.idRange - b.idRange, 0)
-    .map((todo) => (
-      <Todo
-        deleteTodo={props.deleteTodo}
-        setTodoDone={props.setTodoDone}
-        key={todo.id}
-        todo={todo}
-      />
-    ));
+  const todoComponents = props.todos.map((todo) => (
+    <Todo
+      deleteTodo={props.deleteTodo}
+      setTodoDone={props.setTodoDone}
+      key={todo.id}
+      todo={todo}
+    />
+  ));
 
   const loadMore = () => {
     props.loadMoreTodos();
@@ -28,7 +26,7 @@ const TodoList = (props) => {
       >
         {props.loadMore > 0 && (
           <button
-            onClick={props.loadmoreTodos}
+            onClick={(e) => props.loadMoreTodos()}
             className="btn btn-primary btn-lg"
           >
             Load more

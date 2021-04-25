@@ -9,7 +9,9 @@ def start_ui():
 
 
 def start_backend():
-    subprocess.run(["run_backend.sh"], cwd=f"{cwd}/scripts", shell=True)
+    os.environ["FLASK_APP"] = "api/api.py"
+    os.environ["FLASK_ENV"] = "development"
+    subprocess.run(["flask", "run"], cwd=f"{cwd}/src/api", shell=True)
 
 
 start_ui()

@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { performGetDetails } from "../Api";
+
+import { useParams } from "react-router-dom";
 
 const TodoDetails = (props) => {
-  const todo = JSON.parse(localStorage.getItem("todo"));
-  const date = new Date(todo.date);
+  const [todo, setTodo] = useState(null);
+  const { id } = useParams();
+
+  useEffect(() => {
+    performGetDetails(id).then((data) => {
+      setTodo(data);
+    });
+  }, [id]);
 
   const handleStatusChange = (e) => {
     props.setTodoDone(e);
@@ -12,7 +21,10 @@ const TodoDetails = (props) => {
     props.deleteTodo(e);
   };
 
-  console.log();
+  if (!todo) {
+    return null;
+  }
+
   return (
     <div
       id={todo.id}
@@ -27,7 +39,7 @@ const TodoDetails = (props) => {
           {todo.description}
         </h2>
         <h2 className="card-text" style={{ margin: "5%" }}>
-          Date: {date.toUTCString()}
+          Date: {new Date(todo.date).toUTCString()}
         </h2>
       </div>
       <div style={{ margin: "5%", marginLeft: "35%" }}>

@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import "./TodoApp.css";
 import {
-  performGet,
+  performGetAll,
   performDelete,
   performUpdate,
   performDeleteAll,
@@ -26,13 +26,20 @@ export const App = () => {
   }, []);
 
   const loadTodos = () => {
-    performGet(state.pageCount)
+    performGetAll(state.pageCount)
       .then((data) => {
-        setState((prevState) => ({
-          todos: [...prevState.todos, ...data.todos],
-          deleteKey: data.deleteKey,
-          pageCount: data.pageCount,
-        }));
+        setState((prevState) => {
+          const newTodos = [...prevState.todos, ...data.todos].sort(
+            (a, b) => a.idRange - b.idRange,
+            0
+          );
+
+          return {
+            todos: newTodos,
+            deleteKey: data.deleteKey,
+            pageCount: data.pageCount,
+          };
+        });
       })
       .catch((error) => console.log(error));
   };

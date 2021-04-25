@@ -18,7 +18,7 @@ AWS_ENV = os.environ.get("AWS_REGION") is not None
 
 @app.route("/todos", methods=["GET"])
 def get_todos():
-    page_count = request.args.get("pageCount")
+    page_count = int(request.args.get("pageCount"))
     new_index, response = dynamodb.get_todos(page_count)
     deserialized = dynamodb.deserialize(response["Items"])
 
@@ -36,9 +36,9 @@ def get_todos():
     return return_dict
 
 
-@app.route("/todo/<id>", methods=["GET"])
+@app.route("/todo", methods=["GET"])
 def get_details():
-    todo = dynamodb.get_todo(request.json["id"])
+    todo = dynamodb.get_todo(request.args.get("id"))
     return todo
 
 

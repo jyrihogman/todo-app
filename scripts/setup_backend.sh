@@ -9,4 +9,4 @@ echo "Installing Backend dependencies..."
 cd src/api/
 python -m venv venv
 source .\\venv\\Scripts\\activate && pip install -r requirements.txt
-py setup_dev_env.py
+py setup_db.py

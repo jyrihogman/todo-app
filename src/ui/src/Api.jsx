@@ -1,11 +1,15 @@
 const API_URL_PREFIX = getApiUrlPrefix();
 
-export function performGet(pageCount) {
-  return performHttpRequest(`/todos`, "GET", {});
+export function performGetAll(pageCount) {
+  return performHttpRequest(`/todos?pageCount=${pageCount}`, "GET", {});
+}
+
+export function performGetDetails(id) {
+  return performHttpRequest(`/todo?id=${id}`, "GET", {});
 }
 
 export function performAdd(todo) {
-  return performHttpRequest("/todo/add", todo, "POST");
+  return performHttpRequest("/todo/add", "POST", todo);
 }
 
 export function performDelete(todo) {
