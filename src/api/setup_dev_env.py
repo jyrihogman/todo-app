@@ -11,41 +11,24 @@ def get_todos():
 
 
 def create_table():
-    dynamo = boto3.client('dynamodb', endpoint_url='http://localhost:8080')
+    dynamo = boto3.client("dynamodb", endpoint_url="http://localhost:8080")
 
-    existing_tables = dynamo.list_tables()['TableNames']
+    existing_tables = dynamo.list_tables()["TableNames"]
 
     if TABLE_NAME in existing_tables:
-        dynamo.delete_table(
-            TableName=TABLE_NAME
-        )
+        dynamo.delete_table(TableName=TABLE_NAME)
 
     dynamo.create_table(
         TableName=TABLE_NAME,
         AttributeDefinitions=[
-            {
-                'AttributeName': 'Id',
-                'AttributeType': 'S'
-            },
-            {
-                'AttributeName': 'IdRange',
-                'AttributeType': 'N'
-            },
+            {"AttributeName": "Id", "AttributeType": "S"},
+            {"AttributeName": "IdRange", "AttributeType": "N"},
         ],
         KeySchema=[
-            {
-                'AttributeName': 'Id',
-                'KeyType': 'HASH'
-            },
-            {
-                'AttributeName': 'IdRange',
-                'KeyType': 'RANGE'
-            },
+            {"AttributeName": "Id", "KeyType": "HASH"},
+            {"AttributeName": "IdRange", "KeyType": "RANGE"},
         ],
-        ProvisionedThroughput={
-            'ReadCapacityUnits': 10,
-            'WriteCapacityUnits': 10
-        }
+        ProvisionedThroughput={"ReadCapacityUnits": 10, "WriteCapacityUnits": 10},
     )
 
     for todo in get_todos():
@@ -54,25 +37,13 @@ def create_table():
         dynamo.put_item(
             TableName=TABLE_NAME,
             Item={
-                "Id": {
-                    "S": guid
-                },
-                "IdRange": {
-                    "N": todo["idRange"]
-                },
-                "Title": {
-                    "S": todo["title"]
-                },
-                "Description": {
-                    "S": todo["description"]
-                },
-                "IsDone": {
-                    "BOOL": todo["isDone"]
-                },
-                "Date": {
-                    "S": todo["date"]
-                }
-            }
+                "Id": {"S": guid},
+                "IdRange": {"N": todo["idRange"]},
+                "Title": {"S": todo["title"]},
+                "Description": {"S": todo["description"]},
+                "IsDone": {"BOOL": todo["isDone"]},
+                "Date": {"S": todo["date"]},
+            },
         )
 
 

@@ -1,44 +1,54 @@
 const API_URL_PREFIX = getApiUrlPrefix();
 
 export function performGet(pageCount) {
-  return performHttpRequest("/todos", { pageCount });
+  return performHttpRequest(`/todos`, "GET", {});
 }
 
-export function performSave(todo) {
-  return performHttpRequest("/todo/add", todo);
+export function performAdd(todo) {
+  return performHttpRequest("/todo/add", todo, "POST");
 }
 
 export function performDelete(todo) {
-  return performHttpRequest("/todo/delete", {
+  return performHttpRequest("/todo/delete", "DELETE", {
     id: todo.id,
     idRange: todo.idRange,
   });
 }
 
 export function performDeleteAll(deleteKey) {
-  return performHttpRequest("/todo/deleteall", {
+  return performHttpRequest("/todo/deleteall", "DELETE", {
     deleteKey,
   });
 }
 
 export function performUpdate(todo) {
-  return performHttpRequest("/todo/update", {
+  return performHttpRequest("/todo/update", "PUT", {
     id: todo.id,
     idRange: todo.idRange,
     isDone: todo.isDone,
   });
 }
 
-function performHttpRequest(urlSuffix, body = {}) {
-  return fetch(`${API_URL_PREFIX}${urlSuffix}`, {
+function performHttpRequest(urlSuffix, method, body = {}) {
+  return fetch(`${API_URL_PREFIX}${urlSuffix}`, getParams(method, body))
+    .then((response) => response.json())
+    .catch((error) => console.log(error));
+}
+
+function getParams(method, body) {
+  if (method === "GET") {
+    return {
+      method: method,
+    };
+  }
+
+  return {
     headers: {
       "Content-Type": "application/json",
     },
-    method: "POST",
+    method: method,
     body: JSON.stringify(body),
-  })
-    .then((response) => response.json())
-    .catch((error) => console.log(error));
+  };
 }
 
 function getApiUrlPrefix() {

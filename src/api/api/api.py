@@ -16,9 +16,9 @@ TABLE_NAME = "Todos"
 AWS_ENV = os.environ.get("AWS_REGION") is not None
 
 
-@app.route("/todos", methods=["POST"])
+@app.route("/todos", methods=["GET"])
 def get_todos():
-    page_count = request.json.get("pageCount")
+    page_count = request.args.get("pageCount")
     new_index, response = dynamodb.get_todos(page_count)
     deserialized = dynamodb.deserialize(response["Items"])
 
@@ -36,24 +36,24 @@ def get_todos():
     return return_dict
 
 
-@app.route("/todo", methods=["POST"])
+@app.route("/todo/<id>", methods=["GET"])
 def get_details():
     todo = dynamodb.get_todo(request.json["id"])
     return todo
 
 
-@app.route("/todo/update", methods=["POST"])
+@app.route("/todo/update", methods=["PUT"])
 def update_todo():
     response = dynamodb.update_todo(request.json)
     return jsonify(response)
 
 
-@app.route("/todo/delete", methods=["POST"])
+@app.route("/todo/delete", methods=["DELETE"])
 def delete_todo():
     return dynamodb.delete_todo(request.json)
 
 
-@app.route("/todo/deleteall", methods=["POST"])
+@app.route("/todo/deleteall", methods=["DELETE"])
 def delete_all_todos():
     if request.json.get("deleteKey") == UUID:
         dynamodb.delete_all()

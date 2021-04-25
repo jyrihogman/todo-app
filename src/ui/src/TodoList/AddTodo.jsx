@@ -1,78 +1,81 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-class AddTodo extends Component {
-  static propTypes = {
-    addTodo: PropTypes.func.isRequired,
-  };
+const AddTodo = (props) => {
+  const [state, setState] = useState({ todoTitle: "", todoDescription: "" });
 
-  state = {
-    todoTitle: "",
-    todoDescription: "",
-  };
+  const handleChange = (event) => {
+    const { value } = event.currentTarget;
 
-  handleChange = (event) => {
     if (event.currentTarget.id === "titleInput") {
-      this.setState({ todoTitle: event.currentTarget.value });
+      setState((prevState) => ({
+        ...prevState,
+        todoTitle: value,
+      }));
     } else {
-      this.setState({ todoDescription: event.currentTarget.value });
+      setState((prevState) => ({
+        ...prevState,
+        todoDescription: value,
+      }));
     }
   };
 
-  addTodo = () => {
+  const addTodo = () => {
     const todoObject = {
-      title: this.state.todoTitle,
-      description: this.state.todoDescription,
+      title: state.todoTitle,
+      description: state.todoDescription,
     };
 
-    this.props.addTodo(todoObject);
+    props.addTodo(todoObject);
   };
 
-  render() {
-    return (
-      <div
-        style={{ padding: "3%" }}
-        className="jumbotron mx-auto d-block col-sm-3"
-      >
-        <h4>Add a new Todo!</h4>
-        <div className="form-group">
-          <label
-            htmlFor="titleInput"
-            className="col-form-label col-form-label-sm"
-          >
-            Title
-            <input
-              id="titleInput"
-              className="form-control form-control-sm"
-              type="text"
-              onChange={this.handleChange}
-            />
-          </label>
-        </div>
-        <div className="form-group">
-          <label
-            htmlFor="descriptionInput"
-            className="col-form-label col-form-label-sm"
-          >
-            Description
-            <input
-              id="descriptionInput"
-              className="form-control form-control-sm"
-              type="text"
-              onChange={this.handleChange}
-            />
-          </label>
-        </div>
-        <button
-          disabled={!this.state.todoDescription || !this.state.todoTitle}
-          onClick={this.addTodo}
-          className="btn btn-primary"
+  return (
+    <div
+      style={{ padding: "3%" }}
+      className="jumbotron mx-auto d-block col-sm-3"
+    >
+      <h4>Add a new Todo!</h4>
+      <div className="form-group">
+        <label
+          htmlFor="titleInput"
+          className="col-form-label col-form-label-sm"
         >
-          Submit
-        </button>
+          Title
+          <input
+            id="titleInput"
+            className="form-control form-control-sm"
+            type="text"
+            onChange={handleChange}
+          />
+        </label>
       </div>
-    );
-  }
-}
+      <div className="form-group">
+        <label
+          htmlFor="descriptionInput"
+          className="col-form-label col-form-label-sm"
+        >
+          Description
+          <input
+            id="descriptionInput"
+            className="form-control form-control-sm"
+            type="text"
+            onChange={handleChange}
+          />
+        </label>
+      </div>
+      <button
+        disabled={!state.todoDescription || !state.todoTitle}
+        onClick={addTodo}
+        className="btn btn-primary"
+      >
+        Submit
+      </button>
+    </div>
+  );
+};
+
+AddTodo.propTypes = {
+  addTodo: PropTypes.func.isRequired,
+};
 
 export default AddTodo;

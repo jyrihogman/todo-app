@@ -27,7 +27,10 @@ const TodoList = (props) => {
         style={{ marginTop: "2%", marginBottom: "2%" }}
       >
         {props.loadMore > 0 && (
-          <button onClick={loadMore} className="btn btn-primary btn-lg">
+          <button
+            onClick={props.loadmoreTodos}
+            className="btn btn-primary btn-lg"
+          >
             Load more
           </button>
         )}

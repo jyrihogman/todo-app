@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 import TodoList from "./TodoList/TodoList";
 import TodoDetails from "./TodoDetails/TodoDetails";
 import AddTodo from "./TodoList/AddTodo";
@@ -9,28 +9,38 @@ import "./TodoApp.css";
 import {
   performGet,
   performDelete,
-  performSave,
   performUpdate,
   performDeleteAll,
+  performAdd,
 } from "./Api";
 
-export default class App extends Component {
-  state = {
+export const App = () => {
+  const [state, setState] = useState(() => ({
     todos: [],
-    pageCount: 0,
     deleteKey: "",
+    pageCount: 0,
+  }));
+
+  useEffect(() => {
+    loadTodos();
+  }, []);
+
+  const loadTodos = () => {
+    performGet(state.pageCount)
+      .then((data) => {
+        setState((prevState) => ({
+          todos: [...prevState.todos, ...data.todos],
+          deleteKey: data.deleteKey,
+          pageCount: data.pageCount,
+        }));
+      })
+      .catch((error) => console.log(error));
   };
 
-  componentDidMount() {
-    this.loadTodos();
-  }
-
-  addTodo = (todo) => {
-    const { todos } = this.state;
+  const addTodo = (todo) => {
+    const { todos } = state;
     const todoIdRange =
-      todos.length === 0
-        ? 1
-        : todos.slice(this.state.todos.length - 1)[0].idRange + 1;
+      todos.length === 0 ? 1 : todos.slice(todos.length - 1)[0].idRange + 1;
 
     const newTodo = {
       ...todo,
@@ -39,26 +49,26 @@ export default class App extends Component {
       date: new Date().toString(),
     };
 
-    performSave(newTodo).then((resp) => {
-      this.setState((prevState) => ({
+    performAdd(newTodo).then((resp) => {
+      setState((prevState) => ({
         todos: [...prevState.todos, { ...newTodo, id: resp.id }],
       }));
     });
   };
 
-  deleteTodo = (event) => {
+  const deleteTodo = (event) => {
     const todoId = event.currentTarget.id;
-    const todo = this.state.todos.filter((t) => t.id === todoId)[0];
+    const todo = state.todos.filter((t) => t.id === todoId)[0];
 
     performDelete(todo).then(() => {
-      this.setState((prevState) => ({
+      setState((prevState) => ({
         todos: prevState.todos.filter((todo) => todo.id !== todoId),
       }));
     });
   };
 
-  setTodoDone = (event) => {
-    const { todos } = this.state;
+  const setTodoDone = (event) => {
+    const { todos } = state;
 
     const todoId = event.currentTarget.value;
     const todo = todos.filter((todo) => todo.id === todoId)[0];
@@ -71,63 +81,46 @@ export default class App extends Component {
       isDone: newTodo.isDone,
       idRange: newTodo.idRange,
     }).then(() => {
-      this.setState({
+      setState({
         todos: newTodos,
       });
     });
   };
 
-  deleteAllTodos = () => {
-    performDeleteAll(this.state.deleteKey).then(() => {
-      this.setState({ todos: [] });
+  const deleteAllTodos = () => {
+    performDeleteAll(state.deleteKey).then(() => {
+      setState({ todos: [] });
     });
   };
 
-  loadTodos = () => {
-    performGet(this.state.pageCount)
-      .then((data) => {
-        const newTodos = [...this.state.todos, ...data.todos];
+  return (
+    <Router>
+      <div>
+        <AppBar deleteAllTodos={deleteAllTodos} />
+        <Switch>
+          <Route path={`/todo/:id`}>
+            <TodoDetails deleteTodo={deleteTodo} setTodoDone={setTodoDone} />
+          </Route>
+          <Route path="/">
+            <div>
+              <AddTodo addTodo={addTodo} />
+            </div>
+            <div>
+              {!state.todos.length ? null : (
+                <TodoList
+                  todos={state.todos}
+                  loadMore={!!state.pageCount}
+                  loadMoreTodos={loadTodos}
+                  deleteTodo={deleteTodo}
+                  setTodoDone={setTodoDone}
+                />
+              )}
+            </div>
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
+};
 
-        this.setState({
-          todos: newTodos,
-          deleteKey: data.deleteKey,
-          pageCount: data.pageCount,
-        });
-      })
-      .catch((error) => console.log(error));
-  };
-
-  render() {
-    return (
-      <Router>
-        <div>
-          <AppBar deleteAllTodos={this.deleteAllTodos} />
-          <Switch>
-            <Route path={`/todo/:id`}>
-              <TodoDetails
-                deleteTodo={this.deleteTodo}
-                setTodoDone={this.setTodoDone}
-              />
-            </Route>
-            <Route path="/">
-              <div>
-                <AddTodo addTodo={this.addTodo} />
-              </div>
-              <div>
-                {!this.state.todos.length ? null : (
-                  <TodoList
-                    todos={this.state.todos}
-                    loadMore={!!this.state.pageCount}
-                    loadMoreTodos={this.loadTodos}
-                    deleteTodo={this.deleteTodo}
-                    setTodoDone={this.setTodoDone}
-                  />
-                )}
-              </div>
-            </Route>
-          </Switch>
-        </div>
-      </Router>
-    );
-  }
-}
+export default App;

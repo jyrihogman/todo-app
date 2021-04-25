@@ -8,13 +8,11 @@
 - AWS CDK
 - NPM
 
-## Setting up dev env
+## Dev env
 
-- Run setup_dev_env.sh
-- Set FLASK_ENV to "development" (PowerShell $env:FLASK_ENV="development")
-- Set FLASK_APP to "api.py"
-- flask run in src/api
-- npm start in src/ui
+- Run "docker-compose up -d"
+- Run setup_dev_env.py
+- Run start_dev_env.py
 
 Run tests on backend (/src/api) -> python -m pytest .\test\api_test.py
 
