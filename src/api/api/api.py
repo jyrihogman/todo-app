@@ -11,7 +11,7 @@ from service import dynamodb
 
 app = Flask(__name__)
 DOMAIN_NAME = os.environ.get("DOMAIN_NAME") or "*"
-CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": f"http://{DOMAIN_NAME}"}})
 
 UUID = str(uuid.uuid4())
 TABLE_NAME = "Todos"

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { performGetDetails } from "../Api";
 
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 const TodoDetails = (props) => {
   const [todo, setTodo] = useState(null);
   const { id } = useParams();
+  let history = useHistory();
+
+  const cardColor = todo && todo.isDone ? "text-white bg-secondary" : "";
 
   useEffect(() => {
     performGetDetails(id).then((data) => {
@@ -14,11 +17,15 @@ const TodoDetails = (props) => {
   }, [id]);
 
   const handleStatusChange = (e) => {
+    const modifiedTodo = { ...todo, isDone: !todo.isDone };
+    setTodo(modifiedTodo);
+
     props.setTodoDone(e);
   };
 
   const handleDeletion = (e) => {
     props.deleteTodo(e);
+    history.goBack();
   };
 
   if (!todo) {
@@ -28,7 +35,7 @@ const TodoDetails = (props) => {
   return (
     <div
       id={todo.id}
-      className="card col-lg-5 col-lg-offset-1"
+      className={`card ${cardColor} col-lg-5 col-lg-offset-1`}
       style={{ margin: "auto", marginTop: "7%" }}
     >
       <div className="card-body">

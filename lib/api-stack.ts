@@ -18,13 +18,14 @@ export class ApiStack extends cdk.Stack {
       tableName: "Todos",
       partitionKey: { name: "Id", type: dynamo.AttributeType.STRING },
       sortKey: { name: "IdRange", type: dynamo.AttributeType.NUMBER },
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     const pythonFn = new PythonFunction(this, "MyFunction", {
-      entry: path.join(__dirname, "../src/api/"), // required
-      index: "handler.py", // optional, defaults to 'index.py'
-      handler: "handler", // optional, defaults to 'handler'
-      runtime: lambda.Runtime.PYTHON_3_8, // optional, defaults to lambda.Runtime.PYTHON_3_7,
+      entry: path.join(__dirname, "../src/api/"),
+      index: "handler.py",
+      handler: "handler",
+      runtime: lambda.Runtime.PYTHON_3_8,
       environment: {
         DOMAIN_NAME: props.uiDomainName,
       },

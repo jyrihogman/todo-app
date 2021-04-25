@@ -25,14 +25,15 @@ export const App = () => {
     loadTodos();
   }, []);
 
+  function sortTodos(todos) {
+    return todos.sort((a, b) => a.idRange - b.idRange, 0);
+  }
+
   const loadTodos = () => {
     performGetAll(state.pageCount)
       .then((data) => {
         setState((prevState) => {
-          const newTodos = [...prevState.todos, ...data.todos].sort(
-            (a, b) => a.idRange - b.idRange,
-            0
-          );
+          const newTodos = sortTodos([...prevState.todos, ...data.todos]);
 
           return {
             todos: newTodos,
@@ -81,7 +82,10 @@ export const App = () => {
     const todo = todos.filter((todo) => todo.id === todoId)[0];
 
     const newTodo = { ...todo, isDone: !todo.isDone };
-    const newTodos = [...todos.filter((todo) => todo.id !== todoId), newTodo];
+    const newTodos = sortTodos([
+      ...todos.filter((todo) => todo.id !== todoId),
+      newTodo,
+    ]);
 
     performUpdate({
       id: newTodo.id,

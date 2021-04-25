@@ -13,19 +13,16 @@ export class UiStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const websiteBucket = new s3.Bucket(this, "WebsiteBucket", {
+    const appBucket = new s3.Bucket(this, "WebsiteBucket", {
       bucketName: "todojyri-ui-bucket",
-      websiteIndexDocument: INDEX,
-      websiteErrorDocument: INDEX,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
     });
 
-    new s3deploy.BucketDeployment(this, "DeployWebsite", {
-      sources: [s3deploy.Source.asset(ASSET_LOCATION)],
-      destinationBucket: websiteBucket,
-    });
+    this.bucketDeployment(appBucket);
 
     const distribution = new cloudfront.Distribution(this, "myDist", {
-      defaultBehavior: { origin: new origins.S3Origin(websiteBucket) },
+      defaultBehavior: { origin: new origins.S3Origin(appBucket) },
       errorResponses: [
         {
           responseHttpStatus: 200,
@@ -33,10 +30,40 @@ export class UiStack extends cdk.Stack {
           ttl: cdk.Duration.seconds(0),
           httpStatus: 404,
         },
+        {
+          responseHttpStatus: 200,
+          responsePagePath: `/${INDEX}`,
+          ttl: cdk.Duration.seconds(0),
+          httpStatus: 403,
+        },
       ],
       defaultRootObject: INDEX,
     });
 
     this.domainName = distribution.distributionDomainName;
+  }
+
+  bucketDeployment(appBucket: any) {
+    new s3deploy.BucketDeployment(this, "ui-bucket-deployment1", {
+      sources: [s3deploy.Source.asset(ASSET_LOCATION, { exclude: [INDEX] })],
+      cacheControl: [
+        s3deploy.CacheControl.fromString("max-age=604800,public,immutable"),
+      ],
+      destinationBucket: appBucket as any,
+      prune: false,
+    });
+
+    new s3deploy.BucketDeployment(this, "ui-bucket-deployment2", {
+      sources: [
+        s3deploy.Source.asset(ASSET_LOCATION, { exclude: ["*", `!${INDEX}`] }),
+      ],
+      cacheControl: [
+        s3deploy.CacheControl.fromString(
+          "max-age=60,no-cache,no-store,must-revalidate"
+        ),
+      ],
+      destinationBucket: appBucket as any,
+      prune: false,
+    });
   }
 }
