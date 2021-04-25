@@ -5,6 +5,7 @@ import uuid
 from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 from botocore.paginate import TokenEncoder, TokenDecoder
 
+
 TABLE_NAME = "Todos"
 
 encoder = TokenEncoder()
@@ -13,22 +14,22 @@ deserializer = TypeDeserializer()
 serializer = TypeSerializer()
 
 
-def get_todos(page_count):
-    low_value = page_count if page_count is not None else 0
+def get_todos(page_count: int):
+    low_value = page_count
     max_value = low_value + 10
 
     response = get_dynamo_client().scan(TableName=TABLE_NAME,
-                           Limit=20,
-                           ExpressionAttributeValues={
-                               ':min': {"N": str(low_value)},
-                               ':max': {"N": str(max_value)}
-                           },
-                           FilterExpression="IdRange > :min AND IdRange <= :max"
-                           )
+                                        Limit=20,
+                                        ExpressionAttributeValues={
+                                            ':min': {"N": str(low_value)},
+                                            ':max': {"N": str(max_value)}
+                                        },
+                                        FilterExpression="IdRange > :min AND IdRange <= :max"
+                                        )
     return max_value, response
 
 
-def get_todo(identifier):
+def get_todo(identifier: str):
     items = get_dynamo_client().query(TableName=TABLE_NAME,
                                       KeyConditionExpression="Id = :id",
                                       ExpressionAttributeValues={

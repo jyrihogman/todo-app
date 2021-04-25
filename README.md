@@ -16,8 +16,13 @@
 
 Run tests on backend (/src/api) -> python -m pytest .\test\api_test.py
 
+## Deployment
+
+- Run cdk bootstrap
+- Run cdk deploy \*
+
 ## Future development
 
 - Metadata table
-- Dynamically get cloudfront distribution url to api stack
+- VPC for lambda and DB, public APIGW
 - UI tests

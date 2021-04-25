@@ -6,8 +6,12 @@ import * as apigw from "@aws-cdk/aws-apigateway";
 import { PythonFunction } from "@aws-cdk/aws-lambda-python";
 import { Effect, PolicyStatement } from "@aws-cdk/aws-iam";
 
+interface ApiStackProps extends cdk.StackProps {
+  uiDomainName: string;
+}
+
 export class ApiStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
 
     const table = new dynamo.Table(this, "TodoTable", {
@@ -21,6 +25,9 @@ export class ApiStack extends cdk.Stack {
       index: "handler.py", // optional, defaults to 'index.py'
       handler: "handler", // optional, defaults to 'handler'
       runtime: lambda.Runtime.PYTHON_3_8, // optional, defaults to lambda.Runtime.PYTHON_3_7,
+      environment: {
+        DOMAIN_NAME: props.uiDomainName,
+      },
     });
 
     pythonFn.addToRolePolicy(
@@ -40,18 +47,11 @@ export class ApiStack extends cdk.Stack {
       })
     );
 
-    // const fn = new lambda.Function(this, 'TodoApiHandler', {
-    // 	functionName: "TodoApiHandler",
-    // 	runtime: lambda.Runtime.PYTHON_3_8,
-    // 	handler: 'handler.handler',
-    // 	code: lambda.Code.fromAsset(path.join(__dirname, '../src/api/')),
-    //   });
-
     new apigw.LambdaRestApi(this, "TodoApiGw", {
       restApiName: "TodoApiGw",
       handler: pythonFn,
       defaultCorsPreflightOptions: {
-        allowOrigins: ["http://dn62x0l5shy6z.cloudfront.net"],
+        allowOrigins: [`http://${props.uiDomainName}`],
         allowMethods: apigw.Cors.ALL_METHODS,
       },
     });

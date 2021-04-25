@@ -26,9 +26,7 @@ def client():
 @mock_dynamodb2
 def test_get_todos(client):
     create_table()
-    response = client.post('/todos',
-                           data=json.dumps({"pageCount": 0}),
-                           content_type='application/json')
+    response = client.get('/todos?pageCount=0')
 
     assert response.status_code == 200
     assert response.json["deleteKey"] is not None
@@ -39,9 +37,7 @@ def test_get_todos(client):
 def test_get_details(client):
     create_table()
 
-    response = client.post('/todo',
-                           data=json.dumps({"id": "testing_id_1"}),
-                           content_type='application/json')
+    response = client.get('/todo?id=testing_id_1')
 
     assert response.json["id"] == "testing_id_1"
     assert response.status_code == 200
@@ -52,9 +48,9 @@ def test_update_todo(client):
     create_table()
     old_todo = dynamodb.get_todo("testing_id_1")
 
-    response = client.post('/todo/update',
-                           data=json.dumps({"id": "testing_id_1", "idRange": 2, "isDone": True}),
-                           content_type='application/json')
+    response = client.put('/todo/update',
+                          data=json.dumps({"id": "testing_id_1", "idRange": 2, "isDone": True}),
+                          content_type='application/json')
 
     new_todo = dynamodb.get_todo("testing_id_1")
 
@@ -94,9 +90,9 @@ def test_add_todo(client):
 def test_delete_todo(client):
     create_table()
 
-    response = client.post('/todo/delete',
-                           data=json.dumps({"id": "testing_id_1", "idRange": 2}),
-                           content_type='application/json')
+    response = client.delete('/todo/delete',
+                             data=json.dumps({"id": "testing_id_1", "idRange": 2}),
+                             content_type='application/json')
 
     max_val, resp = dynamodb.get_todos(0)
     assert len([item for item in resp["Items"] if item["Id"] == "testing_id_1"]) == 0
