@@ -9,6 +9,20 @@ const AppBar = (props) => {
     history.goBack();
   };
 
+  if (props.deleteAllTodos) {
+    return (
+      <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+        <button
+          className="btn btn-primary btn-lg"
+          style={{ color: "white" }}
+          onClick={props.deleteAllTodos}
+        >
+          Delete all Todos!
+        </button>
+      </nav>
+    );
+  }
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <button
@@ -18,19 +32,12 @@ const AppBar = (props) => {
       >
         Back
       </button>
-      <button
-        className="btn btn-primary btn-lg"
-        style={{ color: "white" }}
-        onClick={props.deleteAllTodos}
-      >
-        Delete all Todos!
-      </button>
     </nav>
   );
 };
 
 AppBar.propTypes = {
-  deleteAllTodos: PropTypes.func.isRequired,
+  deleteAllTodos: PropTypes.func,
 };
 
 export default AppBar;

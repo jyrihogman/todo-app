@@ -107,12 +107,13 @@ export const App = () => {
   return (
     <Router>
       <div>
-        <AppBar deleteAllTodos={deleteAllTodos} />
         <Switch>
           <Route path={`/todo/:id`}>
+            <AppBar />
             <TodoDetails deleteTodo={deleteTodo} setTodoDone={setTodoDone} />
           </Route>
           <Route path="/">
+            <AppBar deleteAllTodos={deleteAllTodos} />
             <div>
               <AddTodo addTodo={addTodo} />
             </div>
